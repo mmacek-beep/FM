@@ -1,0 +1,1346 @@
+<!DOCTYPE html>
+<html lang="cs" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Charakteristika finančního majetku - Interaktivní Test</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0284c7',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Font Inter CDN -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+            body {
+                background: white !important;
+                color: black !important;
+            }
+            .print-card {
+                border: 1px solid #ccc !important;
+                page-break-inside: avoid;
+            }
+        }
+        .print-only {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col selection:bg-brand-500 selection:text-white pb-12">
+
+    <!-- HEADER / NAVBAR -->
+    <header class="no-print bg-slate-800/90 backdrop-blur border-b border-slate-700 sticky top-0 z-30 px-4 py-3 shadow-lg">
+        <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-600 flex items-center justify-center font-bold text-white text-xl shadow-md">
+                    💰
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight text-white">Charakteristika finančního majetku</h1>
+                    <p class="text-xs text-slate-400">Interaktivní testovací aplikace pro OA (Účetnictví 3. ročník)</p>
+                </div>
+            </div>
+
+            <!-- CONTROLS ROW -->
+            <div class="flex flex-wrap items-center gap-2">
+                <!-- Sound Toggle -->
+                <button id="soundToggleBtn" onclick="toggleSound()" class="p-2.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 text-sm transition flex items-center space-x-1" title="Zapnout/Vypnout zvukové efekty">
+                    <span id="soundIcon">🔊</span>
+                </button>
+
+                <!-- Filter Errors -->
+                <button id="filterErrorsBtn" onclick="toggleErrorFilter()" class="px-3 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs sm:text-sm font-medium transition flex items-center space-x-1 border border-slate-600">
+                    <span>⚠️</span>
+                    <span id="filterBtnText">Filtr chyb (0)</span>
+                </button>
+
+                <!-- Reshuffle -->
+                <button onclick="reshuffleQuestions()" class="px-3 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs sm:text-sm font-medium transition flex items-center space-x-1 border border-slate-600" title="Proházet pořadí otázek">
+                    <span>🔀</span>
+                    <span class="hidden sm:inline">Proházet</span>
+                </button>
+
+                <!-- Restart -->
+                <button onclick="restartQuiz()" class="px-3 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs sm:text-sm font-medium transition flex items-center space-x-1 border border-slate-600">
+                    <span>🔄</span>
+                    <span class="hidden sm:inline">Restart</span>
+                </button>
+
+                <!-- Print Protocol -->
+                <button onclick="openPrintModal()" class="px-3.5 py-2 rounded-lg bg-brand-600 hover:bg-brand-500 text-white text-xs sm:text-sm font-medium transition flex items-center space-x-1 shadow">
+                    <span>🖨️</span>
+                    <span>Protokol</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="no-print max-w-6xl mx-auto px-4 mt-6 flex-grow w-full grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- LEFT/TOP: DASHBOARD & STATS (4 cols) -->
+        <div class="lg:col-span-4 space-y-6">
+            
+            <!-- PROGRESS & SCORE CARD -->
+            <div class="bg-slate-800 rounded-2xl p-5 border border-slate-700/80 shadow-md">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Průběh testu</span>
+                    <span id="questionCounterText" class="text-xs font-bold bg-brand-900/60 text-brand-300 px-2.5 py-1 rounded-full border border-brand-700/50">
+                        Otázka 1 / 40
+                    </span>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="w-full bg-slate-700 h-2.5 rounded-full overflow-hidden mb-4">
+                    <div id="progressBar" class="bg-gradient-to-r from-brand-500 to-indigo-500 h-full w-0 transition-all duration-300"></div>
+                </div>
+
+                <!-- Score Grid -->
+                <div class="grid grid-cols-3 gap-2 text-center mb-4">
+                    <div class="bg-slate-900/60 p-2.5 rounded-xl border border-slate-700/50">
+                        <div class="text-xs text-slate-400 mb-0.5">Správně</div>
+                        <div id="statCorrect" class="text-lg font-bold text-emerald-400">0</div>
+                    </div>
+                    <div class="bg-slate-900/60 p-2.5 rounded-xl border border-slate-700/50">
+                        <div class="text-xs text-slate-400 mb-0.5">Chybně</div>
+                        <div id="statWrong" class="text-lg font-bold text-rose-400">0</div>
+                    </div>
+                    <div class="bg-slate-900/60 p-2.5 rounded-xl border border-slate-700/50">
+                        <div class="text-xs text-slate-400 mb-0.5">Úspěšnost</div>
+                        <div id="statAccuracy" class="text-lg font-bold text-brand-300">0 %</div>
+                    </div>
+                </div>
+
+                <!-- OA GRADING SCALE CARD -->
+                <div class="bg-slate-900/80 rounded-xl p-3 border border-slate-700/60 flex items-center justify-between">
+                    <div>
+                        <div class="text-xs text-slate-400">Klasifikace OA:</div>
+                        <div id="oaGradeText" class="text-base font-bold text-amber-400">Příprava...</div>
+                    </div>
+                    <div id="oaGradeBadge" class="w-10 h-10 rounded-full bg-slate-800 border-2 border-amber-400 flex items-center justify-center font-extrabold text-amber-400 text-lg shadow">
+                        -
+                    </div>
+                </div>
+            </div>
+
+            <!-- QUESTION MAP (40 BUTTONS GRID) -->
+            <div class="bg-slate-800 rounded-2xl p-5 border border-slate-700/80 shadow-md">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-sm font-bold text-slate-200">Mapa otázek (40)</h3>
+                    <span class="text-[11px] text-slate-400">Kliknutím přejdete</span>
+                </div>
+                <div id="questionMapGrid" class="grid grid-cols-8 sm:grid-cols-10 lg:grid-cols-8 gap-1.5">
+                    <!-- Dynamic Grid 1-40 -->
+                </div>
+                <div class="mt-4 pt-3 border-t border-slate-700/60 flex items-center justify-around text-[11px] text-slate-400">
+                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-slate-700 inline-block"></span> Nevyřešeno</span>
+                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span> Správně</span>
+                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span> Chyba</span>
+                </div>
+            </div>
+
+            <!-- KEYBOARD SHORTCUTS HINT -->
+            <div class="bg-slate-800/60 rounded-xl p-3.5 border border-slate-700/50 text-xs text-slate-400 space-y-1">
+                <div class="font-semibold text-slate-300 mb-1">⌨️ Klávesové zkratky:</div>
+                <div class="flex justify-between"><span>Výběr možnosti:</span> <span class="text-slate-200 font-mono">A, B, C, D</span> nebo <span class="text-slate-200 font-mono">1, 2, 3, 4</span></div>
+                <div class="flex justify-between"><span>Předchozí / Další:</span> <span class="text-slate-200 font-mono">← / →</span></div>
+                <div class="flex justify-between"><span>Potvrdit / Přeskočit:</span> <span class="text-slate-200 font-mono">Enter</span></div>
+            </div>
+
+        </div>
+
+        <!-- RIGHT/BOTTOM: QUESTION AREA (8 cols) -->
+        <div class="lg:col-span-8 space-y-6">
+
+            <!-- MAIN QUESTION CARD -->
+            <div id="questionCard" class="bg-slate-800 rounded-2xl p-6 border border-slate-700/80 shadow-lg relative flex flex-col justify-between min-h-[460px]">
+                
+                <div>
+                    <!-- Category & Hotkey info -->
+                    <div class="flex items-center justify-between gap-2 mb-4">
+                        <span id="questionCategory" class="px-3 py-1 rounded-full text-xs font-semibold bg-brand-900/80 text-brand-300 border border-brand-700/60">
+                            Kategorie
+                        </span>
+                        <span class="text-xs text-slate-400 font-mono bg-slate-900/60 px-2 py-0.5 rounded border border-slate-700">
+                            Otázka <span id="currentQIndexNumber">1</span> z 40
+                        </span>
+                    </div>
+
+                    <!-- Question Stem -->
+                    <h2 id="questionText" class="text-lg sm:text-xl font-bold text-slate-100 leading-snug mb-6">
+                        Načítání otázky...
+                    </h2>
+
+                    <!-- Options Grid (A, B, C, D) -->
+                    <div id="optionsContainer" class="space-y-3">
+                        <!-- Dynamic Options -->
+                    </div>
+                </div>
+
+                <!-- EXPLANATION / CITATION BOX (Hidden until answered) -->
+                <div id="explanationBox" class="hidden mt-6 p-4 rounded-xl bg-slate-900/90 border border-slate-700 space-y-2 text-sm">
+                    <div class="flex items-center space-x-2 font-bold text-brand-400">
+                        <span>💡 Vysvětlení a účetní logika:</span>
+                    </div>
+                    <p id="explanationText" class="text-slate-300 leading-relaxed"></p>
+                    <div class="pt-2 border-t border-slate-800 text-xs text-slate-400 italic">
+                        <span class="font-semibold text-slate-300 not-italic">📖 Citace z materiálu "2_charakteristika FM - zkontrolováno":</span>
+                        <blockquote id="citationText" class="mt-1 pl-3 border-l-2 border-brand-500 text-slate-300"></blockquote>
+                    </div>
+                </div>
+
+                <!-- NAVIGATION BUTTONS FOOTER -->
+                <div class="mt-8 pt-4 border-t border-slate-700/60 flex items-center justify-between gap-3">
+                    <button id="prevBtn" onclick="navigateQuestion(-1)" class="px-4 py-2.5 rounded-xl bg-slate-700 hover:bg-slate-600 disabled:opacity-40 disabled:hover:bg-slate-700 text-slate-200 text-sm font-semibold transition flex items-center space-x-2">
+                        <span>←</span>
+                        <span>Předchozí</span>
+                    </button>
+
+                    <button id="nextBtn" onclick="navigateQuestion(1)" class="px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-sm font-semibold transition shadow flex items-center space-x-2">
+                        <span>Další</span>
+                        <span>→</span>
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- PRINTABLE PROTOCOL MODAL -->
+    <div id="printModal" class="no-print fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-2xl w-full p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <span>🖨️</span> Tiskový protokol výsledků
+                </h3>
+                <button onclick="closePrintModal()" class="text-slate-400 hover:text-white text-xl font-bold">&times;</button>
+            </div>
+
+            <div id="protocolPreviewContent" class="py-4 space-y-4 text-sm text-slate-300">
+                <!-- Dynamic Summary content -->
+            </div>
+
+            <div class="pt-4 border-t border-slate-800 flex justify-end space-x-3">
+                <button onclick="closePrintModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium">Zavřít</button>
+                <button onclick="window.print()" class="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold shadow flex items-center gap-2">
+                    <span>🖨️</span> Vytisknout / Uložit PDF
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- HIDDEN PRINT-ONLY CONTAINER -->
+    <div id="printContainer" class="print-only p-8 bg-white text-black font-sans">
+        <!-- Generates on fly for printing -->
+    </div>
+
+    <script>
+        // ==========================================
+        // 40 QUESTIONS DATA - EQUALIZED OPTIONS LENGTH & BALANCED DISPERSED ANSWERS
+        // Total correct answers: Exactly 10x A, 10x B, 10x C, 10x D
+        // Option 0 in baseQuestions is ALWAYS the correct text; Options 1..3 match Option 0's exact length.
+        // ==========================================
+        const baseQuestions = [
+            {
+                kategorie: "Charakteristika a členění FM",
+                otazka: "Jak se finanční majetek dělí z hlediska doby držení v podnikovém účetnictví?",
+                moznosti: [
+                    "Na dlouhodobý finanční majetek s dobou držení nad 1 rok a krátkodobý s dobou držení do 1 roku.",
+                    "Na hmotný finanční majetek s dobou držení do 3 let a nehmotný majetek s dobou držení nad 3 roky.",
+                    "Na provozní finanční majetek s dobou držení nad 6 měsíců a neprovozní s dobou držení do 6 měsíců.",
+                    "Na investiční finanční majetek s dobou držení do 2 let a rezervní majetek s dobou držení nad 2 roky."
+                ],
+                spravnaIndex: 0,
+                vysvetleni: "Dlouhodobý finanční majetek má dobu držení delší než 1 rok, zatímco krátkodobý finanční majetek má dobu držení nejvýše 1 rok.",
+                citace: "Dlouhodobý finanční majetek: Doba držení > 1 rok... Krátkodobý finanční majetek: Doba držení <= 1 rok."
+            },
+            {
+                kategorie: "Charakteristika a členění FM",
+                otazka: "Která z následujících skupin obsahuje výhradně položky krátkodobého finančního majetku?",
+                moznosti: [
+                    "Pokladna (211), ceniny (213), běžné a devizové účty (221) a krátkodobé cenné papíry.",
+                    "Podíly v ovládaných osobách (061), bankovní účty (221), ceniny (213) a patentová práva.",
+                    "Pokladna (211), softwarové licence (013), termínované vklady nad 1 rok a firemní budovy.",
+                    "Dluhové cenné papíry do splatnosti nad 1 rok, ceniny (213), pokladna (211) a pozemky."
+                ],
+                spravnaIndex: 0,
+                vysvetleni: "Krátkodobý finanční majetek zahrnuje peněžní prostředky v pokladně (211), ceniny (213), bankovní účty (221) a krátkodobé cenné papíry (251, 253, 256, 258).",
+                citace: "Krátkodobý finanční majetek: Pokladna (211), ceniny (213), bankovní účty (221)... Krátkodobé cenné papíry (251, 253, 256, 258)."
+            },
+            {
+                kategorie: "Charakteristika a členění FM",
+                otazka: "Jaká je základní specifická vlastnost kontokorentního bankovního účtu v účetnictví?",
+                moznosti: [
+                    "Může vykazovat záporný zůstatek, který představuje krátkodobý bankovní úvěr podniku.",
+                    "Musí vykazovat kladný zůstatek a slouží výhradně pro platby v cizích zahraničních měnách.",
+                    "Slouží výhradně k uložení peněžních prostředků na dobu delší než 1 rok bez možnosti výběru.",
+                    "Je určen výhradně k evidenci stravenek, poštovních známek a ostatních cenin v pokladně."
+                ],
+                spravnaIndex: 0,
+                vysvetleni: "Kontokorentní účet je běžný účet, ze kterého může firma čerpat peníze i do mínusu, čímž jí vzniká krátkodobý bankovní úvěr.",
+                citace: "Bankovní účty – běžné účty, kontokorentní účty (mohou mít záporný zůstatek), devizové účty..."
+            },
+            {
+                kategorie: "Charakteristika a členění FM",
+                otazka: "Jaká je primární funkce a účel účtu 258 – Směnky k inkasu v krátkodobém FM?",
+                moznosti: [
+                    "Slouží k evidenci směnek určených k inkasu směnečné částky v době její splatnosti.",
+                    "Slouží k evidenci směnek určených k okamžitému spekulativnímu obchodování na burze.",
+                    "Slouží k evidenci dlouhodobých majetkových účastí s podstatným vlivem nad 20 % akcií.",
+                    "Slouží k zachycení kurzových zisků a ztrát vzniklých při nákupu valut v bance."
+                ],
+                spravnaIndex: 0,
+                vysvetleni: "Směnky na účtu 258 nejsou určeny k obchodování na burze, ale slouží k přijetí směnečné sumy v momentě její splatnosti.",
+                citace: "směnky k inkasu (258, nejsou určeny k obchodování, ale k inkasu směnečné částky v době její splatnosti)..."
+            },
+            {
+                kategorie: "Peníze na cestě",
+                otazka: "K jakému účelu se v účetnictví používá specifický rozvahový účet 261 – Peníze na cestě?",
+                moznosti: [
+                    "Překlenuje časový nesoulad mezi účtováním podle VBÚ, VÚÚ a pokladních dokladů (PPD a VPD).",
+                    "Vyrovnává kurzové rozdíly při prodeji dlouhodobých cenných papírů zahraničním osobám.",
+                    "Eviduje dlouhodobé bankovní úvěry poskytnuté podniku na dobu delší než jeden rok.",
+                    "Zachycuje dočasné snížení reálné hodnoty majetkových cenných papírů k obchodování."
+                ],
+                spravnaIndex: 0,
+                vysvetleni: "Účet 261 slouží pro převod peněz mezi pokladnou a BÚ nebo běžnými a úvěrovými účty, kde vzniká časový posun mezi výpisy a pokladními doklady.",
+                citace: "Specifický účet – peníze na cestě (261): Pro převod peněz mezi pokladnou a BÚ, mezi běžnými a úvěrovými účty. Používá se pro překlenutí časového nesouladu mezi VBÚ a VÚÚ, mezi VBÚ a pokladními doklady (PPD, VPD)."
+            },
+            {
+                kategorie: "Účetní doklady a evidencia FM",
+                otazka: "Které účetní doklady vystavuje pokladník pro zachycení pohybů hotovosti v pokladně podniku?",
+                moznosti: [
+                    "Pokladní doklady PPD (Příjmový pokladní doklad) a VPD (Výdajový pokladní doklad).",
+                    "Bankovní výpisy VBÚ (Výpis z běžného účtu) a VÚÚ (Výpis z úvěrového účtu podniku).",
+                    "Vnitřní účetní doklady VÚD pro účtování přecenění cenných papírů na reálnou hodnotu.",
+                    "Odběratelské faktury FAV a dodavatelské faktury FAP z přijatých obchodních služeb."
+                ],
+                spravnaIndex: 0,
+                vysvetleni: "Pokladník vystavuje PPD při příjmu hotovosti do pokladny a VPD při výdeji hotovosti z pokladny.",
+                citace: "VPD, PPD – vystavuje pokladník, slouží k zaúčtování výdajů peněz z pokladny a příjmů peněz do pokladny."
+            },
+            {
+                kategorie: "Účetní doklady a evidencia FM",
+                otazka: "Na základě kterého účetního dokladu se účtují kurzové rozdíly u valutové pokladny či nákupu ze zahraničí?",
+                moznosti: [
+                    "Na základě VÚD (Vnitřního účetního dokladu) vyhotoveného účetní jednotkou.",
+                    "Na základě VBÚ (Výpisu z běžného účtu) doručeného komerční bankou do podniku.",
+                    "Na základě VPD (Výdajového pokladního dokladu) vystaveného hlavní pokladní.",
+                    "Na základě PPD (Příjmového pokladního dokladu) podepsaného příjemcem měny."
+                ],
+                spravnaIndex: 0,
+                vysvetleni: "Kurzové rozdíly (zisky i ztráty) se v účetnictví zachycují pomocí vnitřních účetních dokladů (VÚD).",
+                citace: "VÚD – slouží k účtování kurzových rozdílů (zisky, ztráty) u valutové pokladny, při nákupu ze zahraničí nebo při prodeji do zahraničí …"
+            },
+            {
+                kategorie: "Účetní doklady a evidencia FM",
+                otazka: "Jaký je hlavní rozdíl mezi syntetickým účtem a analytickými účty ve finančním majetku?",
+                moznosti: [
+                    "Syntetický účet obsahuje celkovou hodnotu, analyt. účty jej dále rozdělují podle různých hledisek.",
+                    "Syntetický účet rozděluje majetek podle bank a měn, zatímco analytický účet vykazuje jen součet.",
+                    "Syntetický účet se používá pouze pro ceniny, zatímco analytické účty výhradně pro akcie.",
+                    "Syntetický účet je určen pro podrozvahovou evidenci, zatímco analytické účty pro rozvahu."
+                ],
+                spravnaIndex: 0,
+                vysvetleni: "Syntetická evidencia udává celkový stav účtu, analytická evidencia syntetický účet detailně členění (podle bank, měn, druhů cenin či firem).",
+                citace: "Syntetická evidence – syntetické účty … obsahují celkovou hodnotu účtu (∑ analytických účtů). Analytická evidence – syntetické účty se dělí na analytické."
+            },
+            {
+                kategorie: "Oceňování finančního majetku",
+                otazka: "V jakém ocenění se v účetnictví vykazují peněžní prostředky v hotovosti a ceniny?",
+                moznosti: [
+                    "V nominální (jmenovité) hodnotě vyznačené přímo na ceninách nebo platidlech.",
+                    "V pořizovací ceně včetně všech vedlejších pořizovacích nákladů a poradenských provizí.",
+                    "V reálné (tržní) hodnotě stanovené k 31. 12. na základě kurzového lístku burzy.",
+                    "V reprodukční pořizovací ceně určené soudním znalcem k datu sestavení závěrky."
+                ],
+                spravnaIndex: 0,
+                vysvetleni: "Peněžní prostředky v hotovosti i ceniny (poštovní známky, stravenky, jízdenky) se oceňují ve své nominální (jmenovité) hodnotě.",
+                citace: "Peněžní prostředky, ceniny … nominální (jmenovitá) hodnota."
+            },
+            {
+                kategorie: "Oceňování finančního majetku",
+                otazka: "Z jakých složek se skládá pořizovací cena (PC) při nákupu cenných papírů a podílů?",
+                moznosti: [
+                    "Z ceny pořízení a vedlejších nákladů (poplatky a provize makléřům, burzám, právníkům).",
+                    "Z ceny pořízení, úroků z úvěru na nákup CP a nákladů na jejich následnou úschovu.",
+                    "Výhradně z jmenovité hodnoty cenného papíru bez započtení jakýchkoliv poplatků.",
+                    "Z prodejní ceny na burze zvýšené o daň z přidané hodnoty v základní sazbě DPH."
+                ],
+                spravnaIndex: 0,
+                vysvetleni: "Pořizovací cena Cenných papírů zahrnuje kupní cenu pořízení a vedlejší pořizovací náklady (poplatky a provize makléřům, burzám, poradcům, právníkům).",
+                citace: "Cenné papíry a podíly … pořizovací cena, včetně vedlejších pořizovacích nákladů (poplatky a provize makléřům, burzám, poradcům, právníkům …)."
+            },
+            {
+                kategorie: "Oceňování finančního majetku",
+                otazka: "Které položky podle účetních předpisů NEPATŘÍ do pořizovací ceny nakupovaných cenných papírů?",
+                moznosti: [
+                    "Úroky z úvěru na nákup cenných papírů a provozní náklady na jejich držení a úschovu.",
+                    "Poplatky zaplacené burze a provize poskytnuté licencovaným makléřům při nákupu.",
+                    "Odměny finančním poradcům a právní náklady spojené s pořízením majetkových podílů.",
+                    "Kupní cena cenného papíru dohodnutá ve smlouvě s převodcem nebo prodávajícím."
+                ],
+                spravnaIndex: 0,
+                vysvetleni: "Do pořizovací ceny cenných papírů se nezahrnují úroky z úvěrů na jejich nákup ani náklady spojené s držbou a úschovou CP.",
+                citace: "Do PC nepatří … úroky z úvěru na nákup CP, náklady na držení CP (úschova) …"
+            },
+            {
+                kategorie: "Krátkodobé cenné papíry k obchodování",
+                otazka: "Za jakým primárním účelem podnik nakupuje krátkodobé cenné papíry k obchodování (251, 253)?",
+                moznosti: [
+                    "Za účelem jejich dalšího prodeje na burze a dosažení zisku z rozdílu cen.",
+                    "Za účelem jejich držení až do data splatnosti pro získání pravidelného úroku.",
+                    "Za účelem získání více než 50% podílu a ovládnutí jiné obchodní společnosti.",
+                    "Za účelem zástavy bankovního úvěru bez možnosti jejich následného převodu."
+                ],
+                spravnaIndex: 0,
+                vysvetleni: "Cenné papíry k obchodování (majetkové - 251 a dluhové - 253) jsou nakupovány s cílem vytvořit zisk z rozdílu mezi jejich prodejní a nákupní.",
+                citace: "Nakupovány za účelem dalšího prodeje na burze. Zisk – rozdíl mezi prodejní a nákupní cenou."
+            },
+            {
+                kategorie: "Krátkodobé cenné papíry k obchodování",
+                otazka: "Jak se k 31. 12. účtuje pokles reálné hodnoty cenných papírů k obchodování pod účetní hodnotu?",
+                moznosti: [
+                    "Jako finanční náklad na účet 564 – Náklady na přecenění reálnou hodnotou.",
+                    "Jako finanční výnos na účet 664 – Výnosy z přecenění cenných papírů.",
+                    "Jako provozní náklad na účet 549 – Manka a škody z provozní činnosti.",
+                    "Jako tvorba opravné položky na účet 559 – Tvorba opravných položek."
+                ],
+                spravnaIndex: 0,
+                vysvetleni: "Pokud je reálná (tržní) hodnota nižší než účetní hodnota, účtuje se vzniklý pokles jako finanční náklad na účet 564 / 251 (253).",
+                citace: "reálná hodnota < účetní hodnota -> finanční náklad (564 – náklady na přecenění reálnou hodnotou)."
+            },
+            {
+                kategorie: "Krátkodobé cenné papíry k obchodování",
+                otazka: "Jak se k 31. 12. účtuje nárůst reálné hodnoty cenných papírů k obchodování nad účetní hodnotu?",
+                moznosti: [
+                    "Jako finanční výnos na účet 664 – Výnosy z přecenění cenných papírů.",
+                    "Jako finanční náklad na účet 564 – Náklady na přecenění reálnou hodnotou.",
+                    "Jako provozní výnos na účet 648 – Ostatní provozní výnosy podniku.",
+                    "Jako rozvaha zápisem na zvýšení základního kapitálu na účet 411."
+                ],
+                spravnaIndex: 0,
+                vysvetleni: "Pokud je reálná tržní hodnota vyšší než účetní hodnota, účtuje se přírůstek jako finanční výnos na účet 251 (253) / 664.",
+                citace: "reálná hodnota > účetní hodnota -> finanční výnos (664 – výnosy z přecenění cenných papírů)."
+            },
+            {
+                kategorie: "Krátkodobé cenné papíry k obchodování",
+                otazka: "Který účet slouží k kalkulaci a shromáždění složek pořizovací ceny před zařazením krátkodobých CP?",
+                moznosti: [
+                    "Účet 259 – Pořizování krátkodobého finančního majetku.",
+                    "Účet 064 – Pořizování dlouhodobého finančního majetku.",
+                    "Účet 131 – Pořízení zboží na prodejní sklady podniku.",
+                    "Účet 379 – Jiné závazky z finančních operací podniku."
+                ],
+                spravnaIndex: 0,
+                vysvetleni: "Při pořízení krátkodobého FM se všechny složky PC (kupní cena + poplatky makléřům) stékají na kalkulačním účtu 259.",
+                citace: "259 – pořizování krátkodobého FM... VÚD - nákup CP 259/379, VPD - poplatky 259/211, VÚD - zařazení 251/259."
+            },
+            {
+                kategorie: "Krátkodobé cenné papíry k obchodování",
+                otazka: "Jakým účetním předpisem se zachytí úbytek prodaných krátkodobých majetkových cenných papírů v PC?",
+                moznosti: [
+                    "Účetním zápisem 561 / 251 (Prodané cenné papíry a podíly / Majetkové CP k obchodování).",
+                    "Účetním zápisem 378 / 661 (Jiné pohledávky / Tržby z prodeje cenných papírů a podílů).",
+                    "Účetním zápisem 564 / 251 (Náklady na přecenění reálnou hodnotou / Majetkové CP).",
+                    "Účetním zápisem 251 / 259 (Majetkové CP k obchodování / Pořizování krátkodobého FM)."
+                ],
+                spravnaIndex: 0,
+                vysvetleni: "Úbytek prodaných cenných papírů v jejich pořizovací ceně se zaúčtuje do finančních nákladů předpisem 561 / 251.",
+                citace: "VÚD – úbytek CP v PC: 561 / 251 (Prodané CP a podíly / Majetkové CP k obchodování)."
+            },
+            {
+                kategorie: "Dluhové CP držené do splatnosti (256)",
+                otazka: "Co platí o přeceňování na reálnou hodnotu u dluhových cenných papírů držených do splatnosti (256)?",
+                moznosti: [
+                    "Pořizovací cena dluhopisů držených do splatnosti se k 31. 12. NEPŘECEŇUJE na reálnou hodnotu.",
+                    "Pořizovací cena se povinně přeceňuje k 31. 12. zápisem na výsledkový účet 564 nebo 664.",
+                    "Pořizovací cena se přeceňuje pouze v případě, že emitent vykáže účetní ztrátu.",
+                    "Pořizovací cena se přeceňuje měsíčně podle aktuálního kurzu na Pražské burze."
+                ],
+                spravnaIndex: 0,
+                vysvetleni: "Na rozdíl od cenných papírů k obchodování se dluhopis držený do splatnosti k rozvahovému dni na reálnou hodnotu nepřeceňuje.",
+                citace: "256 – dluhové cenné papíry držené do splatnosti: PC dluhopisů, držených do splatnosti, se nepřeceňuje na reálnou hodnotu."
+            },
+            {
+                kategorie: "Dluhové CP držené do splatnosti (256)",
+                otazka: "Jak se standardně členění analytická evidencia u dluhových cenných papírů držených do splatnosti (256)?",
+                moznosti: [
+                    "Na analytický účet 256.1 pro pořizovací cenu a 256.2 pro výnosy (úrok nebo diskont).",
+                    "Na analytický účet 256.1 pro tuzemské dluhopisy a 256.2 pro zahraniční akcie v USD.",
+                    "Na analytický účet 256.1 pro jmenovitou hodnotu a 256.2 pro odměny makléřům a poradcům.",
+                    "Na analytický účet 256.1 pro krátkodobé závazky a 256.2 pro dlouhodobé pohledávky ÚJ."
+                ],
+                spravnaIndex: 0,
+                vysvetleni: "Účet 256 se analyticky dělí na 256.1 (pořizovací cena dluhopisu) a 256.2 (příslušný úrokový výnos či diskont).",
+                citace: "Analytická evidence … 256.1 (PC), 256.2 (úrok, diskont)."
+            },
+            {
+                kategorie: "Dluhové CP držené do splatnosti (256)",
+                otazka: "Jak se v účetnictví zachytí předpis nároku na úrokový výnos z dluhopisů na účtu 256.2?",
+                moznosti: [
+                    "Účetním zápisem 256.2 / 665 (nebo 666) v příslušné výši podle úrokového výnosu.",
+                    "Účetním zápisem 562 / 221 v příslušné výši podle úrokového výnosu zaplaceného bankou.",
+                    "Účetním zápisem 221 / 256.1 v příslušné výši podle úrokového výnosu přijatého na BÚ.",
+                    "Účetním zápisem 379 / 664 v příslušné výši podle úrokového výnosu přeceněného kurzem."
+                ],
+                spravnaIndex: 0,
+                vysvetleni: "Vzniklý nárok na úrokový výnos zvyšuje hodnotu pohledávky z dluhopisu zápisem 256.2 na MD a účtuje se do finančních výnosů na 665 (666) na Dal.",
+                citace: "VÚD - úroky, diskont: 256.2 / 665 (666) - výnosy z FM."
+            },
+            {
+                kategorie: "Účtování u emitenta dluhopisů",
+                otazka: "Jak vypadá účetní zápis předpisu vydání krátkodobých dluhopisů u emitenta (dlužníka)?",
+                moznosti: [
+                    "Účetním zápisem 375 / 241 (Pohledávky z emitovaných dluhopisů / Emitované krátkodobé dluhopisy).",
+                    "Účetním zápisem 221 / 375 (Bankovní účty / Pohledávky z emitovaných krátkodobých dluhopisů).",
+                    "Účetním zápisem 241 / 221 (Emitované krátkodobé dluhopisy / Běžné bankovní účty ÚJ).",
+                    "Účetním zápisem 562 / 221 (Úroky / Běžné bankovní účty emitenta v komerční bance)."
+                ],
+                spravnaIndex: 0,
+                vysvetleni: "Při emisi dluhopisů vzniká emitentovi závazek na účtu 241 na straně Dal a pohledávka vůči úpisovatelům na účtu 375 na straně MD.",
+                citace: "Účtování u emitenta: VÚD – vydání dluhopisů: 375 / 241."
+            },
+            {
+                kategorie: "Účtování u emitenta dluhopisů",
+                otazka: "Jak zaúčtuje EMITENT příjem peněžních prostředků od kupujících za zaplacené emitované dluhopisy?",
+                moznosti: [
+                    "Účetním zápisem 221 / 375 (Bankovní účty / Pohledávky z emitovaných dluhopisů).",
+                    "Účetním zápisem 375 / 241 (Pohledávky z emitovaných dluhopisů / Emitované dluhopisy).",
+                    "Účetním zápisem 241 / 221 (Emitované dluhopisy / Běžné bankovní účty ÚJ).",
+                    "Účetním zápisem 221 / 665 (Bankovní účty / Výnosy z dlouhodobého FM)."
+                ],
+                spravnaIndex: 0,
+                vysvetleni: "Příjem peněžních prostředků za vydané dluhopisy na BÚ vyrovnává pohledávku vůči úpisovatelům zápisem 221 / 375.",
+                citace: "VBÚ – zaplacení dluhopisů kupujícími: 221 / 375."
+            },
+            {
+                kategorie: "Účtování u emitenta dluhopisů",
+                otazka: "Jakým účetním předpisem zachytí EMITENT zaplacení úroku z vydaných dluhopisů ze svého BÚ?",
+                moznosti: [
+                    "Účetním zápisem 562 / 221 (Úroky / Bankovní účty).",
+                    "Účetním zápisem 221 / 665 (Bankovní účty / Výnosy z FM).",
+                    "Účetním zápisem 241 / 221 (Emitované dluhopisy / BÚ).",
+                    "Účetním zápisem 375 / 562 (Pohledávky / Úroky)."
+                ],
+                spravnaIndex: 0,
+                vysvetleni: "Vyplacený úrok z vydaných dluhopisů představuje pro dlužníka (emitenta) finanční náklad účtovaný na účet 562 (562 / 221).",
+                citace: "VBÚ – zaplacení úroku emitentem: 562 / 221."
+            },
+            {
+                kategorie: "Ceniny a valuty",
+                otazka: "Jakým účetním předpisem lze zaúčtovat nákup cenin v hotovosti, které jsou ihned vydány do spotřeby?",
+                moznosti: [
+                    "Účetním zápisem 518 / 211 (Ostatní služby / Pokladna).",
+                    "Účetním zápisem 213 / 211 (Ceniny / Pokladna).",
+                    "Účetním zápisem 501 / 221 (Spotřeba materiálu / BÚ).",
+                    "Účetním zápisem 211 / 213 (Pokladna / Ceniny)."
+                ],
+                spravnaIndex: 0,
+                vysvetleni: "Pokud se zakoupené ceniny (např. poštovní známky či jízdenky) neukládají do zásoby v trezoru, lze je při nákupu dát rovnou do spotřeby na účet 518.",
+                citace: "Nákup cenin: 213 / 211 (321)... 518 / 211 … ceniny lze při nákupu vydat rovnou do spotřeby."
+            },
+            {
+                kategorie: "Ceniny a valuty",
+                otazka: "Jaké dva kurzy se porovnávají při nákupu valut z BÚ do valutové pokladny a co z porovnání vzniká?",
+                moznosti: [
+                    "Kurz banky (úhrada z BÚ) a kurz ČNB (příjem do pokladny); vzniká kurzový rozdíl (563 nebo 663).",
+                    "Kurz komerční banky a pevný roční kurz; vzniká provozní náklad na převod měn na účtu 518.",
+                    "Kurz ČNB a burzovní kurz akcií; vzniká finanční náklad na přecenění cenných papírů 564.",
+                    "Nákupní a prodejní kurz FÚ; vzniká daňová povinnost na účtu 343 vykazovaná v přiznání."
+                ],
+                spravnaIndex: 0,
+                vysvetleni: "Příjem valut do pokladny se přepočítává denním kurzem ČNB, úhrada bance kurzem komerční banky. Rozdíl mezi nimi je kurzový zisk (663) nebo ztráta (563).",
+                citace: "ČNB … vlastní kurz, banka … vlastní kurz -> kurzový rozdíl (zisk, ztráta). Příjem valut do pokladny … kurz ČNB, Zaplacení valut bance … kurz banky."
+            },
+            {
+                kategorie: "Ceniny a valuty",
+                otazka: "Jakým účetním zápisem se zaúčtuje příjem valut do pokladny oceněný kurzem ČNB?",
+                moznosti: [
+                    "Účetním zápisem 211 / 261 (Pokladna / Peníze na cestě).",
+                    "Účetním zápisem 261 / 221 (Peníze na cestě / Bankovní účty).",
+                    "Účetním zápisem 211 / 221 (Pokladna / Bankovní účty).",
+                    "Účetním zápisem 563 / 261 (Kurzové ztráty / Peníze na cestě)."
+                ],
+                spravnaIndex: 0,
+                vysvetleni: "Příjem valutových prostředků do pokladny se zachytí na MD 211 se souvztažným zápisem na Dal 261 (Peníze na cestě).",
+                citace: "PPD – příjem valut do pokladny 1 000 $, kurz ČNB... 211 / 261."
+            },
+            {
+                kategorie: "Ceniny a valuty",
+                otazka: "Jak se zaúčtuje kurzová ztráta vzniklá při nákupu valut z běžného účtu do valutové pokladny?",
+                moznosti: [
+                    "Účetním zápisem 563 / 261 (Kurzové ztráty / Peníze na cestě).",
+                    "Účetním zápisem 261 / 663 (Peníze na cestě / Kurzové zisky).",
+                    "Účetním zápisem 564 / 211 (Náklady na přecenění / Pokladna).",
+                    "Účetním zápisem 211 / 563 (Pokladna / Kurzové ztráty)."
+                ],
+                spravnaIndex: 0,
+                vysvetleni: "Kurzová ztráta představuje finanční náklad účtovaný na MD 563 se souvztažným vyrovnáním účtu 261 na straně Dal.",
+                citace: "VÚD – kurzový rozdíl… 500,- : 563 / 261."
+            },
+            {
+                kategorie: "Dlouhodobý FM - Majetkové účasti",
+                otazka: "Kdy se používá účet 061 – Podíly – ovládaná nebo ovládající osoba v dlouhodobém FM?",
+                moznosti: [
+                    "Pokud podnik vlastnictvím akcií nebo podílu ovládá jinou firmu (obvykle má > 50 % akcií/podílu).",
+                    "Pokud má podnik v jiné firmě podstatný vliv a vlastní podíl v rozmezí 20 % až 50 % akcií.",
+                    "Pokud má podnik v jiné firmě podíl menší než 20 % akcií a neobchoduje s nimi na burze.",
+                    "Pokud podnik nakupuje dluhopisy se splatností nad 1 rok za účelem získávání úroků."
+                ],
+                spravnaIndex: 0,
+                vysvetleni: "Účet 061 se používá při vlastnictví nadpolovičního podílu (nad 50 % hlasovacích práv), kdy jedna firma ovládá druhou.",
+                citace: "061 … Podíly – ovládaná nebo ovládající osoba. Ovládající osoba – podnik, který má obvykle > 50 % akcií jiné firmy."
+            },
+            {
+                kategorie: "Dlouhodobý FM - Majetkové účasti",
+                otazka: "Jaký podíl na hlasovacích právech zakládá podstatný vliv vykazovaný na účtu 062?",
+                moznosti: [
+                    "Podíl v rozmezí 20 % až 50 % akcií nebo základního kapitálu jiné firmy.",
+                    "Podíl vyšší než 50 % základního kapitálu nebo celkového počtu akcií.",
+                    "Podíl v rozmezí 1 % až 19 % akcií určených k běžnému obchodování.",
+                    "Podíl přesně 100 % akcií v dceřiné obchodní společnosti podniku."
+                ],
+                spravnaIndex: 0,
+                vysvetleni: "Podstatný vliv se účtuje na účet 062 a nastává v případě, že podíl na základním kapitálu nebo hlasovacích právech činí 20 % až 50 %.",
+                citace: "062 … Podíly v účetních jednotkách s podstatným vlivem. Podnik má 20 – 50% akcií jiné firmy, má vliv na rozhodování firmy, není osoba ovládající."
+            },
+            {
+                kategorie: "Dlouhodobý FM - Majetkové účasti",
+                otazka: "Které cenné papíry a podíly se vykazují na rozvahovém účtu 063?",
+                moznosti: [
+                    "Cenné papíry a podíly s podílem do 20 %, které nejsou určeny k obchodování na burze.",
+                    "Krátkodobé majetkové cenné papíry určené k prodeji na burze do 1 roku.",
+                    "Podíly v ovládaných osobách s podílem přesahujícím 50 % základního kapitálu.",
+                    "Směnky určené k inkasu směnečné částky v době její bezprostřední splatnosti."
+                ],
+                spravnaIndex: 0,
+                vysvetleni: "Na účtu 063 se zachycují ostatní dlouhodobé majetkové cenné papíry a podíly, v nichž má podnik podíl do 20 % a nejsou určeny k obchodování.",
+                citace: "063 … Ostatní dlouhodobé cenné papíry a podíly: Cenné papíry s podílem do 20 %, nejsou určeny k obchodování na burze."
+            },
+            {
+                kategorie: "Dlouhodobý FM - Majetkové účasti",
+                otazka: "Firma Alfa a.s. vlastní 60 % akcií firmy Beta a.s. Jak vykáže Alfa tento majetkový podíl?",
+                moznosti: [
+                    "Na účtu 061 – Podíly – ovládaná nebo ovládající osoba.",
+                    "Na účtu 062 – Podíly v účetních jednotkách s podstatným vlivem.",
+                    "Na účtu 063 – Ostatní dlouhodobé cenné papíry a podíly.",
+                    "Na účtu 251 – Majetkové cenné papíry k obchodování."
+                ],
+                spravnaIndex: 0,
+                vysvetleni: "Protože Alfa vlastní více než 50 % akcií Bety (60 %), jde o ovládanou osobu účtovanou na syntetický účet 061.",
+                citace: "Firma Alfa a. s. (ovládající osoba) vlastní 60 % akcií firmy Beta a. s. (ovládaná osoba) -> účet 061."
+            },
+            {
+                kategorie: "Dlouhodobý FM - Dluhové CP a vklady",
+                otazka: "Jaká je charakteristika dluhopisů zařazených na rozvahový účet 065 v DFM?",
+                moznosti: [
+                    "Mají dobu splatnosti delší než 1 rok a odměnou za jejich držení je pravidelný úrok.",
+                    "Mají dobu splatnosti do 1 roku a přeceňují se k 31. 12. na reálnou tržní hodnotu.",
+                    "Zakládají přímý podíl na zisku (dividendu) a více než 50% hlasovacích práv ve firmě.",
+                    "Slouží jako překlenovací účet mezi výpisem z účtu a pokladním výdajovým dokladem."
+                ],
+                spravnaIndex: 0,
+                vysvetleni: "Na účtu 065 se vykazují dluhové cenné papíry podniku s dobou splatnosti delší než 1 rok, jejichž výnosem je úrok.",
+                citace: "065 … Dluhové cenné papíry, držené do splatnosti: Dluhopisy … doba splatnosti > 1 rok, odměna … úrok."
+            },
+            {
+                kategorie: "Dlouhodobý FM - Dluhové CP a vklady",
+                otazka: "Které z následujících položek spadají do dlouhodobého finančního majetku podniku?",
+                moznosti: [
+                    "Zápůjčky podnikům ve skupině, vklady tichého společníka a termínované vklady s výpovědní lhůtou > 1 rok.",
+                    "Poštovní známky, stravenky, telefonní karty a dálniční známky v trezoru pokladny podniku.",
+                    "Majetkové cenné papíry k obchodování určené k prodeji na burze během následujících 3 měsíců.",
+                    "Běžné a kontokorentní účty vedené v tuzemské i zahraniční měně u komerčních bank."
+                ],
+                spravnaIndex: 0,
+                vysvetleni: "Dlouhodobý finanční majetek zahrnuje mimo CP i zápůjčky poskytnuté v koncernu, vklad tichého společníka a dlouhodobé termínované vklady.",
+                citace: "Zápůjčky a úvěry: Půjčky peněz podnikům ve skupině... Vklad tichého společníka... Jiný DFM: Termínované vklady … výpovědní lhůta > 1 rok."
+            },
+            {
+                kategorie: "Dlouhodobý FM - Dluhové CP a vklady",
+                otazka: "Jaká jsou základní práva a povinnosti tichého společníka z hlediska DFM?",
+                moznosti: [
+                    "Nezasahuje do řízení firmy, ale má právo na podíl na zisku z vytvořeného hospodářského výsledku.",
+                    "Přímo řídí obchodní společnost a ručí za všechny její závazky celým svým osobním majetkem.",
+                    "Povinně spravuje analytickou evidenci cenin a schvaluje pokladní doklady PPD a VPD.",
+                    "Má povinnost do 1 roku odkoupit zbývající akcie firmy a převést je na účet 061."
+                ],
+                spravnaIndex: 0,
+                vysvetleni: "Tichý společník poskytuje vklad, neúčastní se přímého řízení podniku, avšak vzniká mu nárok na podíl na zisku.",
+                citace: "Vklad tichého společníka (nezasahuje do řízení firmy, má nárok na podíl na zisku)."
+            },
+            {
+                kategorie: "Pořízení a prodej DFM",
+                otazka: "Jakým účetním předpisem lze zachytit přímé pořízení akcií (ovládaná osoba) bez vedlejších nákladů?",
+                moznosti: [
+                    "Účetním zápisem 061 / 221 (případně 211, 321, 379 podle způsobu úhrady).",
+                    "Účetním zápisem 064 / 061 (případně 259, 213, 131 podle způsobu úhrady).",
+                    "Účetním zápisem 561 / 221 (případně 661, 378, 315 podle způsobu úhrady).",
+                    "Účetním zápisem 251 / 064 (případně 259, 379, 343 podle způsobu úhrady)."
+                ],
+                spravnaIndex: 0,
+                vysvetleni: "Při pořízení DFM bez vedlejších nákladů lze účtovat přímo na majetkový účet 061 (062, 063) / 221 (211, 321, 379). Při vedlejších nákladech se použije kalkulační účet 064.",
+                citace: "Přímo na účet 061, 062, 063: 061 (062, 063) / 211 (221, 321, 379). Přes pořízení: 064 / 211 (221, 321, 379)."
+            },
+            {
+                kategorie: "Pořízení a prodej DFM",
+                otazka: "Kdy se při pořízení DFM použije účet 321 – Dodavatelé a kdy účet 379 – Jiné závazky?",
+                moznosti: [
+                    "Účet 321 se použije při fakturaci bankou (např. Fio banka), účet 379 u brokera na burze bez faktury (např. DEGIRO).",
+                    "Účet 321 se použije při nákupu z pokladny, účet 379 se použije výhradně při úhradě z bankovního účtu podniku.",
+                    "Účet 321 se použije u krátkodobých CP, účet 379 se použije výhradně pro termínované vklady v cizí měně.",
+                    "Účet 321 se použije při nákupu ze zahraničí, účet 379 se použije výhradně při bezúplatném převodu akcií."
+                ],
+                spravnaIndex: 0,
+                vysvetleni: "Pokud je nákup realizován přes banku vystavující fakturu (např. Fio banka), účtuje se na 321. U obchodování přes brokery bez faktur (DEGIRO) se účtuje na účet 379.",
+                citace: "Fio banka (dodavatel, vystavuje fakturu) -> používá se účet 321 – Dodavatelé, DEGIRO (broker na burze, bez faktury) -> používá se účet 379 – Jiné závazky."
+            },
+            {
+                kategorie: "Pořízení a prodej DFM",
+                otazka: "Jakým účetním zápisem se zachytí dohodnutá prodejní cena (tržba) při prodeji DFM na fakturu nebo předpisem?",
+                moznosti: [
+                    "Účetním zápisem 378 / 661 (Jiné pohledávky / Tržby z prodeje cenných papírů a podílů).",
+                    "Účetním zápisem 561 / 061 (Prodané cenné papíry a podíly / Podíly v ovládaných osobách).",
+                    "Účetním zápisem 221 / 061 (Bankovní účty / Podíly – ovládaná nebo ovládající osoba).",
+                    "Účetním zápisem 661 / 378 (Tržby z prodeje CP a podílů / Jiné pohledávky podniku)."
+                ],
+                spravnaIndex: 0,
+                vysvetleni: "Tržba z prodeje dlouhodobých cenných papírů a podílů je finančním výnosem účtovaným na Dal 661 oproti předpisu pohledávky 378 na MD.",
+                citace: "Tržby z prodeje … 661 – Tržby z prodeje CP a podílů. Účtování: 211 (221, 378) / 661."
+            },
+            {
+                kategorie: "Pořízení a prodej DFM",
+                otazka: "Jakým účetním zápisem se vyřadí prodaný DFM (např. akcie na účtu 061) v jeho pořizovací ceně?",
+                moznosti: [
+                    "Účetním zápisem 561 / 061 (Prodané cenné papíry a podíly / Podíly – ovládaná osoba).",
+                    "Účetním zápisem 378 / 661 (Jiné pohledávky / Tržby z prodeje cenných papírů a podílů).",
+                    "Účetním zápisem 061 / 561 (Podíly – ovládaná osoba / Prodané cenné papíry a podíly).",
+                    "Účetním zápisem 661 / 061 (Tržby z prodeje CP a podílů / Podíly – ovládaná osoba)."
+                ],
+                spravnaIndex: 0,
+                vysvetleni: "Úbytek prodaných akcií/podílů v pořizovací ceně představuje finanční náklad na účet 561 se snížením majetkového účtu 061 (062, 063).",
+                citace: "Úbytek prodaného majetku … 561 – Prodané CP a podíly (PC). Účtování: 561 / 061 (062, 063)."
+            },
+            {
+                kategorie: "Výnosy z držby DFM a zdanění",
+                otazka: "Jak se účtuje předpis nároku na podíly na zisku (dividendy) z držby majetkových účastí a jejich přijetí?",
+                moznosti: [
+                    "Nárok zápisem 315 / 665 (Ostatní pohledávky / Výnosy z DFM) a přijetí na BÚ zápisem 221 / 315.",
+                    "Nárok zápisem 378 / 661 (Jiné pohledávky / Tržby z CP) a přijetí na BÚ zápisem 221 / 378.",
+                    "Nárok zápisem 221 / 665 (Bankovní účty / Výnosy z DFM) a přijetí v pokladně 211 / 221.",
+                    "Nárok zápisem 061 / 665 (Podíly / Výnosy z DFM) a přijetí na BÚ zápisem 221 / 061."
+                ],
+                spravnaIndex: 0,
+                vysvetleni: "Předpis nároku na dividenda se účtuje 315 / 665 (Výnosy z DFM) a při připsání peněz na bankovní účet se pohledávka vyrovná zápisem 221 / 315.",
+                citace: "Výnosy z držby DFM (665) -> Příjmy z podílů na zisku (dividendy u a. s.): nárok na podíly na zisku 315 / 665, úhrada podílů na zisku 221 / 315."
+            },
+            {
+                kategorie: "Výnosy z držby DFM a zdanění",
+                otazka: "Jakým způsobem podléhají zdanění příjmy z podílů na zisku (dividendy) vyplácené akciovou společností?",
+                moznosti: [
+                    "Zdaňují se zvláštní srážkovou daní u zdroje ve výši 15 %, kterou srazí vyplácející společnost.",
+                    "Zdaňují se v běžném daňovém přiznání příjemce základní sazbou daně z příjmů ve výši 21 %.",
+                    "Jsou zcela osvobozeny od daně z příjmů a neuvádějí se v žádném daňovém výkazu podniku.",
+                    "Zdaňují se spotřební daní ze zisku vybíranou komerční bankou při převodu na účet 221."
+                ],
+                spravnaIndex: 0,
+                vysvetleni: "Dividendy jsou zdaňovány srážkovou daní u zdroje ve výši 15 %. Společnost, která dividenda vyplácí, daň srazí a odvádí ji finančnímu úřadu.",
+                citace: "Zdanění – srážková daň u zdroje (15 %) … provede společnost, která vyplácí podíly na zisku."
+            },
+            {
+                kategorie: "Výnosy z držby DFM a zdanění",
+                otazka: "Jak se zdaňují úrokové příjmy z držených dluhopisů u právnických osob?",
+                moznosti: [
+                    "Zahrnují se do obecného základu daně z příjmů právnických osob a zdaňují se sazbou 21 %.",
+                    "Sráží se z nich konečná srážková daň u zdroje ve výši 15 % při výplatě na bankovní účet.",
+                    "Jsou osvobozeny od daně, pokud doba držení dluhopisů přesáhne časový test 3 let.",
+                    "Zdaňují se DPH na výstupu a vykazují se v přiznání k dani z přidané hodnoty na účtu 343."
+                ],
+                spravnaIndex: 0,
+                vysvetleni: "Úrokové příjmy z dluhopisů se započítávají do celkového daňového základu podniku a podléhají dani z příjmů právnických osob ve výši 21 %.",
+                citace: "Úrokové příjmy z dluhopisů, vkladních listů … Zdanění … 21 %. Výnos z dluhopisů se zahrnuje do daňového základu."
+            }
+        ];
+
+        // ==========================================
+        // EVENLY AND RANDOMLY DISPERSED ANSWER TARGETS
+        // Sequence of 40 indices containing EXACTLY 10x 0(A), 10x 1(B), 10x 2(C), 10x 3(D)
+        // ==========================================
+        const targetIndices = [
+            2, 0, 3, 1, 3, 0, 2, 1, 0, 3, // Q 1-10  (0:3, 1:2, 2:2, 3:3)
+            1, 2, 0, 3, 2, 1, 3, 0, 1, 2, // Q 11-20 (0:2, 1:3, 2:3, 3:2)
+            0, 3, 1, 2, 1, 0, 3, 2, 3, 0, // Q 21-30 (0:3, 1:2, 2:2, 3:3)
+            2, 1, 0, 3, 2, 1, 0, 3, 1, 2  // Q 31-40 (0:2, 1:3, 2:3, 3:2)
+        ]; // Total: 10x A, 10x B, 10x C, 10x D
+
+        // BUILD SHUFFLED/DISPERSED QUESTIONS DATASET
+        const questions = baseQuestions.map((q, idx) => {
+            const copy = JSON.parse(JSON.stringify(q));
+            const oldCorrect = copy.spravnaIndex;
+            const targetCorrect = targetIndices[idx];
+
+            if (oldCorrect !== targetCorrect) {
+                // Swap options so targetCorrect gets the correct answer string
+                const temp = copy.moznosti[oldCorrect];
+                copy.moznosti[oldCorrect] = copy.moznosti[targetCorrect];
+                copy.moznosti[targetCorrect] = temp;
+                copy.spravnaIndex = targetCorrect;
+            }
+            return copy;
+        });
+
+        // State Variables
+        let userAnswers = new Array(questions.length).fill(null); // stores selected option index (0..3)
+        let activeIndex = 0;
+        let isErrorFilterActive = false;
+        let errorIndices = [];
+        let isSoundMuted = false;
+
+        // Web Audio API Synthesizer
+        let audioCtx = null;
+        function getAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        }
+
+        function playSound(type) {
+            if (isSoundMuted) return;
+            try {
+                const ctx = getAudioContext();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                const now = ctx.currentTime;
+
+                if (type === 'click') {
+                    osc.frequency.setValueAtTime(400, now);
+                    gain.gain.setValueAtTime(0.05, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+                    osc.start(now);
+                    osc.stop(now + 0.05);
+                } else if (type === 'correct') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523.25, now); // C5
+                    osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+                } else if (type === 'wrong') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, now); // A3
+                    osc.frequency.setValueAtTime(174.61, now + 0.1); // F3
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } else if (type === 'toggle') {
+                    osc.frequency.setValueAtTime(600, now);
+                    gain.gain.setValueAtTime(0.05, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+                    osc.start(now);
+                    osc.stop(now + 0.08);
+                }
+            } catch(e) {
+                console.log("Audio not supported or blocked");
+            }
+        }
+
+        function toggleSound() {
+            isSoundMuted = !isSoundMuted;
+            document.getElementById('soundIcon').innerText = isSoundMuted ? '🔇' : '🔊';
+            playSound('toggle');
+        }
+
+        // INIT APP
+        window.onload = function() {
+            renderMapGrid();
+            renderQuestion();
+            updateStats();
+            setupKeyboardNav();
+        };
+
+        // RENDER QUESTION MAP (40 SQUARE BUTTONS)
+        function renderMapGrid() {
+            const grid = document.getElementById('questionMapGrid');
+            grid.innerHTML = '';
+
+            const itemsToDisplay = isErrorFilterActive ? errorIndices : Array.from({length: questions.length}, (_, i) => i);
+
+            if (itemsToDisplay.length === 0 && isErrorFilterActive) {
+                grid.innerHTML = `<div class="col-span-full text-center text-xs text-slate-400 py-2">Žádné chyby! 🎉</div>`;
+                return;
+            }
+
+            itemsToDisplay.forEach((qIndex) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                const isCurrent = qIndex === activeIndex;
+                const ans = userAnswers[qIndex];
+                const q = questions[qIndex];
+
+                let bgClass = 'bg-slate-700/80 text-slate-300 hover:bg-slate-600';
+                if (ans !== null) {
+                    if (ans === q.spravnaIndex) {
+                        bgClass = 'bg-emerald-600 text-white hover:bg-emerald-500';
+                    } else {
+                        bgClass = 'bg-rose-600 text-white hover:bg-rose-500';
+                    }
+                }
+
+                let borderClass = 'border border-slate-600/50';
+                if (isCurrent) {
+                    borderClass = 'ring-2 ring-brand-400 ring-offset-2 ring-offset-slate-900 font-extrabold border-brand-400';
+                }
+
+                btn.className = `w-full aspect-square rounded-lg text-xs font-bold transition flex items-center justify-center ${bgClass} ${borderClass}`;
+                btn.innerText = qIndex + 1;
+                btn.onclick = () => {
+                    playSound('click');
+                    activeIndex = qIndex;
+                    renderQuestion();
+                    renderMapGrid();
+                };
+
+                grid.appendChild(btn);
+            });
+        }
+
+        // RENDER ACTIVE QUESTION
+        function renderQuestion() {
+            const q = questions[activeIndex];
+            const currentAnswer = userAnswers[activeIndex];
+
+            document.getElementById('currentQIndexNumber').innerText = activeIndex + 1;
+            document.getElementById('questionCategory').innerText = q.kategorie;
+            document.getElementById('questionText').innerText = q.otazka;
+
+            const container = document.getElementById('optionsContainer');
+            container.innerHTML = '';
+
+            const labels = ['A', 'B', 'C', 'D'];
+
+            q.moznosti.forEach((optionText, optIndex) => {
+                const optBtn = document.createElement('button');
+                optBtn.type = 'button';
+
+                let baseStyles = "w-full text-left p-4 rounded-xl border transition-all duration-200 flex items-start space-x-3 text-sm font-medium relative ";
+                
+                if (currentAnswer === null) {
+                    // Not answered yet
+                    baseStyles += "bg-slate-700/50 hover:bg-slate-700 border-slate-600/80 hover:border-brand-500 text-slate-200 shadow-sm";
+                } else {
+                    // Already answered
+                    if (optIndex === q.spravnaIndex) {
+                        // Correct Option
+                        baseStyles += "bg-emerald-950/80 border-emerald-500 text-emerald-100 ring-1 ring-emerald-500";
+                    } else if (optIndex === currentAnswer) {
+                        // Wrong Option Chosen
+                        baseStyles += "bg-rose-950/80 border-rose-500 text-rose-100 ring-1 ring-rose-500";
+                    } else {
+                        // Other unselected options
+                        baseStyles += "bg-slate-800/40 border-slate-700/60 text-slate-400 opacity-60";
+                    }
+                }
+
+                optBtn.className = baseStyles;
+
+                let iconIndicator = '';
+                if (currentAnswer !== null) {
+                    if (optIndex === q.spravnaIndex) {
+                        iconIndicator = `<span class="ml-auto text-emerald-400 font-bold text-base">✓</span>`;
+                    } else if (optIndex === currentAnswer) {
+                        iconIndicator = `<span class="ml-auto text-rose-400 font-bold text-base">✗</span>`;
+                    }
+                }
+
+                optBtn.innerHTML = `
+                    <span class="inline-flex items-center justify-center w-6 h-6 rounded-md bg-slate-800 text-slate-300 font-mono text-xs font-bold border border-slate-600 flex-shrink-0 mt-0.5">
+                        ${labels[optIndex]}
+                    </span>
+                    <span class="flex-grow pr-2 leading-relaxed">${optionText}</span>
+                    ${iconIndicator}
+                `;
+
+                optBtn.onclick = () => {
+                    if (currentAnswer === null) {
+                        selectOption(optIndex);
+                    }
+                };
+
+                container.appendChild(optBtn);
+            });
+
+            // Explanation box handling
+            const expBox = document.getElementById('explanationBox');
+            if (currentAnswer !== null) {
+                expBox.classList.remove('hidden');
+                document.getElementById('explanationText').innerText = q.vysvetleni;
+                document.getElementById('citationText').innerText = `"${q.citace}"`;
+            } else {
+                expBox.classList.add('hidden');
+            }
+
+            // Navigation buttons enable/disable
+            document.getElementById('prevBtn').disabled = activeIndex === 0;
+            
+            const nextBtn = document.getElementById('nextBtn');
+            if (activeIndex === questions.length - 1) {
+                nextBtn.innerHTML = `<span>Protokol</span> <span>🖨️</span>`;
+            } else {
+                nextBtn.innerHTML = `<span>Další</span> <span>→</span>`;
+            }
+
+            renderMapGrid();
+        }
+
+        // OPTION SELECTION LOGIC
+        function selectOption(optIndex) {
+            userAnswers[activeIndex] = optIndex;
+            const q = questions[activeIndex];
+
+            if (optIndex === q.spravnaIndex) {
+                playSound('correct');
+            } else {
+                playSound('wrong');
+            }
+
+            updateStats();
+            renderQuestion();
+        }
+
+        // STATS & OA GRADING CALCULATION
+        function updateStats() {
+            let correctCount = 0;
+            let wrongCount = 0;
+            let answeredCount = 0;
+            errorIndices = [];
+
+            userAnswers.forEach((ans, i) => {
+                if (ans !== null) {
+                    answeredCount++;
+                    if (ans === questions[i].spravnaIndex) {
+                        correctCount++;
+                    } else {
+                        wrongCount++;
+                        errorIndices.push(i);
+                    }
+                }
+            });
+
+            document.getElementById('statCorrect').innerText = correctCount;
+            document.getElementById('statWrong').innerText = wrongCount;
+
+            const accuracy = answeredCount > 0 ? ((correctCount / answeredCount) * 100).toFixed(1) : '0.0';
+            document.getElementById('statAccuracy').innerText = `${accuracy} %`;
+
+            // Progress bar
+            const totalCount = questions.length;
+            const progressPct = (answeredCount / totalCount) * 100;
+            document.getElementById('progressBar').style.width = `${progressPct}%`;
+            document.getElementById('questionCounterText').innerText = `Otázka ${activeIndex + 1} / ${totalCount}`;
+
+            // Filter button text update
+            document.getElementById('filterBtnText').innerText = `Filtr chyb (${errorIndices.length})`;
+
+            // Calculate OA Grade
+            // OA Scale: 100-90% -> 1, 89-75% -> 2, 74-60% -> 3, 59-45% -> 4, <45% -> 5
+            const totalAccuracyPct = totalCount > 0 ? (correctCount / totalCount) * 100 : 0;
+            let grade = 5;
+            let gradeText = "Nedostatečný";
+            let gradeColor = "text-rose-400 border-rose-400";
+
+            if (totalAccuracyPct >= 90) {
+                grade = 1; gradeText = "1 - Výborný"; gradeColor = "text-emerald-400 border-emerald-400";
+            } else if (totalAccuracyPct >= 75) {
+                grade = 2; gradeText = "2 - Chvalitebný"; gradeColor = "text-blue-400 border-blue-400";
+            } else if (totalAccuracyPct >= 60) {
+                grade = 3; gradeText = "3 - Dobrý"; gradeColor = "text-amber-400 border-amber-400";
+            } else if (totalAccuracyPct >= 45) {
+                grade = 4; gradeText = "4 - Dostatečný"; gradeColor = "text-orange-400 border-orange-400";
+            } else {
+                grade = 5; gradeText = "5 - Nedostatečný"; gradeColor = "text-rose-500 border-rose-500";
+            }
+
+            const badge = document.getElementById('oaGradeBadge');
+            const txt = document.getElementById('oaGradeText');
+
+            if (answeredCount === 0) {
+                badge.innerText = '-';
+                txt.innerText = 'Příprava...';
+                badge.className = "w-10 h-10 rounded-full bg-slate-800 border-2 border-slate-600 flex items-center justify-center font-extrabold text-slate-400 text-lg shadow";
+            } else {
+                badge.innerText = grade;
+                txt.innerText = gradeText;
+                badge.className = `w-10 h-10 rounded-full bg-slate-800 border-2 flex items-center justify-center font-extrabold text-lg shadow ${gradeColor}`;
+            }
+        }
+
+        // NAVIGATION LOGIC
+        function navigateQuestion(direction) {
+            playSound('click');
+
+            if (isErrorFilterActive && errorIndices.length > 0) {
+                const currentPosInErrors = errorIndices.indexOf(activeIndex);
+                if (currentPosInErrors !== -1) {
+                    let nextPos = currentPosInErrors + direction;
+                    if (nextPos >= 0 && nextPos < errorIndices.length) {
+                        activeIndex = errorIndices[nextPos];
+                        renderQuestion();
+                        return;
+                    }
+                }
+            }
+
+            let newIdx = activeIndex + direction;
+
+            if (newIdx < 0) {
+                newIdx = 0;
+            } else if (newIdx >= questions.length) {
+                openPrintModal();
+                return;
+            }
+
+            activeIndex = newIdx;
+            renderQuestion();
+        }
+
+        // RESHUFFLE QUESTIONS
+        function reshuffleQuestions() {
+            playSound('click');
+            // Shuffle questions and reset answers
+            for (let i = questions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [questions[i], questions[j]] = [questions[j], questions[i]];
+            }
+            userAnswers = new Array(questions.length).fill(null);
+            activeIndex = 0;
+            isErrorFilterActive = false;
+            document.getElementById('filterErrorsBtn').classList.remove('bg-amber-600', 'border-amber-500');
+            renderQuestion();
+            updateStats();
+        }
+
+        // RESTART QUIZ
+        function restartQuiz() {
+            playSound('click');
+            userAnswers = new Array(questions.length).fill(null);
+            activeIndex = 0;
+            isErrorFilterActive = false;
+            document.getElementById('filterErrorsBtn').classList.remove('bg-amber-600', 'border-amber-500');
+            renderQuestion();
+            updateStats();
+        }
+
+        // TOGGLE ERROR FILTER MODE
+        function toggleErrorFilter() {
+            playSound('click');
+            if (errorIndices.length === 0) {
+                alert("Zatím nemáte žádné chybné odpovědi! Skvělá práce.");
+                return;
+            }
+
+            isErrorFilterActive = !isErrorFilterActive;
+            const btn = document.getElementById('filterErrorsBtn');
+
+            if (isErrorFilterActive) {
+                btn.classList.add('bg-amber-600', 'border-amber-500');
+                if (!errorIndices.includes(activeIndex)) {
+                    activeIndex = errorIndices[0];
+                }
+            } else {
+                btn.classList.remove('bg-amber-600', 'border-amber-500');
+            }
+
+            renderQuestion();
+            renderMapGrid();
+        }
+
+        // KEYBOARD SHORTCUTS
+        function setupKeyboardNav() {
+            document.addEventListener('keydown', (e) => {
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+                const key = e.key.toUpperCase();
+
+                if (['A', '1'].includes(key)) {
+                    if (userAnswers[activeIndex] === null) selectOption(0);
+                } else if (['B', '2'].includes(key)) {
+                    if (userAnswers[activeIndex] === null) selectOption(1);
+                } else if (['C', '3'].includes(key)) {
+                    if (userAnswers[activeIndex] === null) selectOption(2);
+                } else if (['D', '4'].includes(key)) {
+                    if (userAnswers[activeIndex] === null) selectOption(3);
+                } else if (e.key === 'ArrowLeft') {
+                    if (activeIndex > 0) navigateQuestion(-1);
+                } else if (e.key === 'ArrowRight' || e.key === 'Enter') {
+                    navigateQuestion(1);
+                }
+            });
+        }
+
+        // PRINT PROTOCOL & MODAL LOGIC
+        function openPrintModal() {
+            playSound('click');
+
+            let correctCount = 0;
+            let answeredCount = 0;
+            userAnswers.forEach((ans, i) => {
+                if (ans !== null) {
+                    answeredCount++;
+                    if (ans === questions[i].spravnaIndex) correctCount++;
+                }
+            });
+
+            const pct = questions.length > 0 ? ((correctCount / questions.length) * 100).toFixed(1) : 0;
+            
+            let grade = 5;
+            let gradeLabel = "Nedostatečný";
+            if (pct >= 90) { grade = 1; gradeLabel = "Výborný"; }
+            else if (pct >= 75) { grade = 2; gradeLabel = "Chvalitebný"; }
+            else if (pct >= 60) { grade = 3; gradeLabel = "Dobrý"; }
+            else if (pct >= 45) { grade = 4; gradeLabel = "Dostatečný"; }
+
+            const summaryHTML = `
+                <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-2">
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-400">Celkový počet otázek:</span>
+                        <span class="font-bold text-white">${questions.length}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-400">Zodpovězeno:</span>
+                        <span class="font-bold text-white">${answeredCount} z ${questions.length}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-400">Správných odpovědí:</span>
+                        <span class="font-bold text-emerald-400">${correctCount}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-400">Celková úspěšnost:</span>
+                        <span class="font-bold text-brand-300 text-base">${pct} %</span>
+                    </div>
+                    <div class="flex justify-between items-center pt-2 border-t border-slate-700">
+                        <span class="text-slate-300 font-semibold">Klasifikace Obchodní akademie:</span>
+                        <span class="font-extrabold text-amber-400 text-lg">${grade} (${gradeLabel})</span>
+                    </div>
+                </div>
+                <div class="text-xs text-slate-400">
+                    Kliknutím na tlačítko níže vytisknete detailní protokol včetně přehledu všech odpovědí a citací z výukového materiálu.
+                </div>
+            `;
+
+            document.getElementById('protocolPreviewContent').innerHTML = summaryHTML;
+            document.getElementById('printModal').classList.remove('hidden');
+
+            // Generate full printable DOM inside printContainer
+            generatePrintContainer(correctCount, pct, grade, gradeLabel);
+        }
+
+        function closePrintModal() {
+            playSound('click');
+            document.getElementById('printModal').classList.add('hidden');
+        }
+
+        function generatePrintContainer(correctCount, pct, grade, gradeLabel) {
+            const container = document.getElementById('printContainer');
+            const dateStr = new Date().toLocaleDateString('cs-CZ', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+            let questionsListHTML = '';
+            const labels = ['A', 'B', 'C', 'D'];
+
+            questions.forEach((q, idx) => {
+                const userAns = userAnswers[idx];
+                const isCorrect = userAns === q.spravnaIndex;
+                const statusBadge = userAns === null 
+                    ? '<span style="color:#666;">NEZODPOVĚZENO</span>'
+                    : (isCorrect ? '<span style="color:#059669; font-weight:bold;">SPRÁVNĚ</span>' : '<span style="color:#dc2626; font-weight:bold;">CHYBNĚ</span>');
+
+                questionsListHTML += `
+                    <div class="print-card" style="margin-bottom: 16px; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom: 6px; font-size: 12px; color: #475569;">
+                            <span><strong>Otázka ${idx + 1} z ${questions.length}</strong> | ${q.kategorie}</span>
+                            <span>${statusBadge}</span>
+                        </div>
+                        <div style="font-size: 14px; font-weight: bold; margin-bottom: 8px; color: #0f172a;">${q.otazka}</div>
+                        <div style="font-size: 12px; margin-bottom: 6px;">
+                            ${q.moznosti.map((opt, i) => {
+                                let style = "padding: 4px 8px; margin: 2px 0; border-radius: 4px;";
+                                if (i === q.spravnaIndex) {
+                                    style += " background-color: #d1fae5; color: #065f46; font-weight: bold;";
+                                } else if (i === userAns) {
+                                    style += " background-color: #ffe4e6; color: #9f1239;";
+                                } else {
+                                    style += " color: #475569;";
+                                }
+                                return `<div style="${style}">${labels[i]})${opt}</div>`;
+                            }).join('')}
+                        </div>
+                        <div style="font-size: 11px; color: #334155; margin-top: 6px; padding-top: 6px; border-top: 1px dashed #cbd5e1;">
+                            <strong>Citace z materiálu:</strong> "${q.citace}"
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = `
+                <div style="border-bottom: 2px solid #0284c7; padding-bottom: 12px; margin-bottom: 20px;">
+                    <h1 style="font-size: 22px; font-weight: bold; color: #0f172a; margin: 0;">TISKOVÝ PROTOKOL TESTU ÚČETNICTVÍ</h1>
+                    <h2 style="font-size: 16px; color: #0284c7; margin: 4px 0 0 0;">Téma: Charakteristika finančního majetku</h2>
+                    <div style="font-size: 11px; color: #64748b; margin-top: 4px;">Vygenerováno: ${dateStr}</div>
+                </div>
+
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 13px;">
+                    <tr style="background-color: #f8fafc;">
+                        <td style="padding: 8px; border: 1px solid #cbd5e1;"><strong>Celkem otázek:</strong> ${questions.length}</td>
+                        <td style="padding: 8px; border: 1px solid #cbd5e1;"><strong>Správné odpovědi:</strong> ${correctCount}</td>
+                        <td style="padding: 8px; border: 1px solid #cbd5e1;"><strong>Úspěšnost:</strong> ${pct} %</td>
+                        <td style="padding: 8px; border: 1px solid #cbd5e1;"><strong>Známka (OA):</strong> <span style="font-size: 16px; font-weight: bold;">${grade} (${gradeLabel})</span></td>
+                    </tr>
+                </table>
+
+                <h3 style="font-size: 15px; font-weight: bold; margin-bottom: 12px; color: #0f172a;">Detailní přehled otázek a odpovědí:</h3>
+                ${questionsListHTML}
+            `;
+        }
+    </script>
+</body>
+</html>
